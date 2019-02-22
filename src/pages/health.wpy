@@ -1,0 +1,229 @@
+<template>
+  <view class="wrapper">
+    <!-- 头部搜索 -->
+    <view class="header">
+      <input type="text" placeholder="搜索你今天吃的食物"/>
+      <text class="iconfont icon-fangdajing"></text>
+    </view>
+    <!-- 内容 -->
+    <view class="content">
+      <view class="left">
+        <repeat for="{{array}}" key="index" index="index" item="item">
+          <view class="{{idx===item.id?'active':''}}" @tap="handleClick({{item.id}})">{{item.nm}}</view>
+        </repeat>
+      </view>
+      <view class="right">
+        <repeat for="{{list}}" key="index" index="index" item="item">
+          <view class="{{item.flag?'active':''}}" @tap="uphealthdata({{idx}},{{index}})">
+            <image src="{{item.imgUrl}}" mode="scaleToFill"
+            lazy-load="false"/>
+            <view>{{item.name}}</view>
+          </view>
+        </repeat>
+      </view>
+    </view>
+    <!-- dialog -->
+    <view class="dialog">
+      <view class="tit">
+        <view>已选食物({{count}})</view>
+        <view style="background:red;color:#fff;padding:5rpx 18rpx;border-radius:40rpx;">去测评</view>
+      </view>
+      <view class="ck">
+        <repeat for="{{arr}}" key="index" index="index" item="item">
+          <repeat for="{{item}}" key="index" index="idx" item="itm">
+            <view wx:if="{{itm.flag}}" @tap="uphealthdata({{index}},{{idx}})">{{itm.name}}</view>
+          </repeat>
+        </repeat>
+      </view>
+    </view>
+  </view>
+</template>
+<script>
+import wepy from 'wepy';
+import { connect } from 'wepy-redux';
+import { gethealthdata, uphealthdata } from '../store/actions/counter';
+@connect(
+  {
+    list: function(state) {
+      return state.health.obj[this.data.idx];
+    },
+    arr: function(state) {
+      return state.health.obj;
+    },
+    count: function(state) {
+      return state.health.count;
+    }
+  },
+  {
+    gethealthdata,
+    uphealthdata
+  }
+)
+export default class Health extends wepy.page {
+  config = {
+    navigationBarTitleText: '食物健康测评'
+  };
+  data = {
+    array: [
+      {
+        id: 1,
+        nm: '主食'
+      },
+      {
+        id: 2,
+        nm: '蛋奶豆制品'
+      },
+      {
+        id: 3,
+        nm: '蔬菜类'
+      },
+      {
+        id: 4,
+        nm: '水果类'
+      },
+      {
+        id: 5,
+        nm: '肉类'
+      },
+      {
+        id: 6,
+        nm: '酒水'
+      },
+      {
+        id: 7,
+        nm: '饮料'
+      },
+      {
+        id: 8,
+        nm: '海鲜类'
+      }
+    ],
+    idx: 1,
+    arr: []
+  };
+  onLoad() {
+    this.methods.gethealthdata(1);
+  }
+  methods = {
+    handleClick(idx) {
+      this.idx = idx;
+      // if(!this.arr[idx]){
+      this.methods.gethealthdata(idx);
+      // }
+      // this.arr[idx]=true;
+    }
+  };
+}
+</script>
+<style lang="less" scoped>
+@import '../icon/iconfont.wxss';
+.header {
+  width: 90%;
+  margin: 0 auto;
+  height: 80rpx;
+  background: #eee;
+  border-radius: 40rpx;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  input {
+    margin-left: 50rpx;
+    height: 100%;
+    flex: 1;
+    font-size: 35rpx;
+    color: gray;
+  }
+  text {
+    margin-right: 40rpx;
+    color: gray;
+  }
+}
+.content {
+  display: flex;
+  margin-top: 30rpx;
+}
+.left {
+  width: 200rpx;
+  background: #eee;
+  margin-right: 18rpx;
+  view {
+    line-height: 120rpx;
+    text-align: center;
+    font-size: 30rpx;
+  }
+  .active {
+    background: #fff;
+    font-weight: bold;
+  }
+}
+.right {
+  flex: 1;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  flex-wrap: wrap;
+  view {
+    margin-right: 30rpx;
+    text-align: center;
+    margin-bottom: 30rpx;
+    color: gray;
+  }
+  image {
+    width: 140rpx;
+    height: 140rpx;
+    border-radius: 10rpx;
+  }
+  .active {
+    image {
+      border: solid 2rpx red;
+    }
+    view {
+      color: red;
+    }
+  }
+}
+.dialog {
+  width: 100%;
+  // height:300rpx;
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  background: #fff;
+  z-index: 99;
+  .tit {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20rpx;
+  }
+  .ck {
+    padding: 0 20rpx;
+    display: flex;
+    flex-wrap: wrap;
+    view {
+      margin-right: 40rpx;
+      padding: 10rpx 30rpx;
+      border: solid 1rpx #ccc;
+      position: relative;
+      margin-bottom: 30rpx;
+    }
+    view::after {
+      content: 'X';
+      font-size: 25rpx;
+      color: red;
+      border-radius: 50%;
+      background: #eee;
+      display: inline-block;
+      width: 30rpx;
+      height: 30rpx;
+      text-align: center;
+      line-height: 30rpx;
+      position: absolute;
+      top: -10rpx;
+      right: -10rpx;
+    }
+  }
+}
+</style>
+
+
